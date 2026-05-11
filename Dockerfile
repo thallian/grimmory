@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM node:24-alpine AS frontend-build
+FROM --platform=$BUILDPLATFORM docker.io/node:24-alpine AS frontend-build
 
 WORKDIR /workspace/frontend
 
@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/workspace/.yarn/cache \
     --mount=type=cache,target=/workspace/frontend/.angular/cache \
     CI=1 NG_CLI_ANALYTICS=false corepack yarn build:prod
 
-FROM --platform=$BUILDPLATFORM gradle:9.5.0-jdk25-alpine AS backend-build
+FROM --platform=$BUILDPLATFORM docker.io/gradle:9.5.0-jdk25-alpine AS backend-build
 
 ARG TARGETARCH
 ARG APP_VERSION=development
@@ -39,7 +39,7 @@ RUN set -eux; \
     jar_path="$(find build/libs -maxdepth 1 -name '*.jar' ! -name '*plain.jar' | head -n 1)"; \
     cp "$jar_path" /workspace/backend/app.jar
 
-FROM mwader/static-ffmpeg:8.1 AS ffprobe-layer
+FROM docker.io/mwader/static-ffmpeg:8.1 AS ffprobe-layer
 
 FROM scratch AS kepubify-layer-amd64
 
@@ -63,7 +63,7 @@ ADD \
 
 FROM kepubify-layer-${TARGETARCH} AS kepubify-layer
 
-FROM eclipse-temurin:25-jre-alpine
+FROM docker.io/eclipse-temurin:25-jre-alpine
 
 ENV JAVA_TOOL_OPTIONS="-XX:+UseShenandoahGC \
     -XX:ShenandoahGCHeuristics=compact \
