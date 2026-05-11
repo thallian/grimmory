@@ -34,4 +34,9 @@ fi
 mkdir -p /app/data /bookdrop /books
 chown "$USER_ID:$GROUP_ID" /app/data /bookdrop /books 2>/dev/null || true
 
+if [ "${DATABASE_PASSWORD_FILE+set}" ]; then
+    echo "Setting db password from $DATABASE_PASSWORD_FILE"
+    export DATABASE_PASSWORD=$(cat "$DATABASE_PASSWORD_FILE")
+fi
+
 exec su-exec "$USER_ID:$GROUP_ID" "$@"
